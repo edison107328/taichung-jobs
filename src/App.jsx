@@ -1,4 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />import { useState, useRef, useEffect, useCallback } from "react";
 
 /* ═══════════════════════════════════════════
    DESIGN SYSTEM
@@ -881,3 +884,122 @@ export default function App() {
     </div>
   );
 }
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="台中日領現金工作站 - 當日工作當日領現金，台中各區職缺免費媒合" />
+    <meta name="keywords" content="台中打工,日領現金,台中工作,短期工作,日薪工作" />
+    <title>台中日領現金工作站</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+{
+  "name": "taichung-jobs",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}
+
+# 台中日領現金工作站 — 部署指南
+
+## 🚀 最快上線方式（免費，15分鐘）
+
+### 方法一：Vercel 一鍵部署（推薦）
+
+1. **建立 GitHub 帳號**
+   - 前往 https://github.com 免費註冊
+
+2. **建立新專案**
+   - 點右上角「+」→「New repository」
+   - 名稱：`taichung-jobs`
+   - 選 Public → 點「Create repository」
+
+3. **上傳所有檔案**
+   - 把這個資料夾的所有檔案拖曳上傳到 GitHub
+
+4. **連接 Vercel**
+   - 前往 https://vercel.com 用 GitHub 帳號登入
+   - 點「Add New Project」→ 選你的 `taichung-jobs`
+   - Framework Preset 選「Vite」
+   - 點「Deploy」→ 等待約 1 分鐘
+
+5. **完成！**
+   - 你的網站網址：`taichung-jobs.vercel.app`
+
+---
+
+### 方法二：Netlify 部署
+
+1. 前往 https://netlify.com 免費註冊
+2. 把這個資料夾直接拖曳到 Netlify 的部署區域
+3. 等待部署完成
+4. 免費網址：`random-name.netlify.app`
+
+---
+
+## 🔑 後台管理
+
+- 進入網站後點底部「🗂️ 後台」
+- 預設密碼：`admin888`
+- **上線前請務必修改密碼！**
+  - 在 `src/App.jsx` 搜尋 `admin888`，改成你自己的密碼
+
+---
+
+## 📱 自訂設定
+
+在 `src/App.jsx` 中可以修改：
+
+| 搜尋這個 | 改成 |
+|---------|------|
+| `04-2345-6789` | 你的真實電話 |
+| `admin888` | 你的後台密碼 |
+| `台中日領現金工作站` | 你的公司名稱 |
+
+---
+
+## 💰 升級到自訂域名（可選）
+
+1. 在 GoDaddy / Namecheap 購買域名（約 $500-800/年）
+   - 推薦：`tcjobs.tw` 或 `taichingjobs.com`
+2. 在 Vercel 設定中新增自訂域名
+3. 照指示修改 DNS 設定（約 24小時生效）
+
+---
+
+## 📞 需要協助？
+
+如有任何部署問題，可以回到 Claude 繼續詢問！
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})
