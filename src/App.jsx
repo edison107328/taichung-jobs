@@ -104,7 +104,7 @@ const FLOWS = {
     ],
   },
   js_done: {
-    msg: "🎉 登記完成！\n\n我們的顧問將在 **2小時內** 主動聯繫您，為您推薦最適合的日領職缺！\n\n📞 有急事請撥：0934011029\n⏰ 服務時間：週一至週六 09:00-18:00\n\n祝您找到心目中的好工作！💪",
+    msg: "🎉 登記完成！\n\n我們的顧問將在 **2小時內** 主動聯繫您，為您推薦最適合的日領職缺！\n\n📞 有急事請撥：04-2345-6789\n⏰ 服務時間：週一至週六 09:00-18:00\n\n祝您找到心目中的好工作！💪",
     opts: [
       { label: "🏠 回主選單", next: "start" },
       { label: "🗺️ 繼續查看職缺", next: "js_area_browse" },
@@ -137,7 +137,7 @@ const FLOWS = {
     ],
   },
   emp_urgent: {
-    msg: "🚨 緊急補班服務：\n\n我們提供 4小時內 快速到位服務！\n\n📞 緊急專線：0934011029\n⏰ 緊急服務：07:00-22:00（含假日）\n\n請留下需求，顧問立即處理 👇",
+    msg: "🚨 緊急補班服務：\n\n我們提供 4小時內 快速到位服務！\n\n📞 緊急專線：04-2345-6789\n⏰ 緊急服務：07:00-22:00（含假日）\n\n請留下需求，顧問立即處理 👇",
     opts: [
       { label: "📝 填寫緊急需求", next: "emp_company" },
       { label: "📞 直接電話聯繫", next: "human" },
@@ -173,7 +173,7 @@ const FLOWS = {
     input: { placeholder: "例：陳經理 0912345678", save: "contact", next: "emp_done" },
   },
   emp_done: {
-    msg: "✅ 職缺資料收到！\n\n系統已進入審核流程，通常在 **1個工作天內** 完成審核並為您推薦求職者。\n\n📋 顧問將主動聯繫您確認細節\n📞 有急事請撥：0934011029\n\n感謝您選擇台中日領現金工作站！🙏",
+    msg: "✅ 職缺資料收到！\n\n系統已進入審核流程，通常在 **1個工作天內** 完成審核並為您推薦求職者。\n\n📋 顧問將主動聯繫您確認細節\n📞 有急事請撥：04-2345-6789\n\n感謝您選擇台中日領現金工作站！🙏",
     opts: [
       { label: "🏠 回主選單", next: "start" },
       { label: "🚨 我有緊急需求", next: "emp_urgent" },
@@ -213,7 +213,7 @@ const FLOWS = {
     ],
   },
   human: {
-    msg: "🙋 正在為您轉接真人客服...\n\n⏳ 預計等待：3–5 分鐘\n📞 或直接撥打：0934011029\n⏰ 服務時間：週一至週六 09:00-18:00\n\n感謝您的耐心，我們馬上為您服務！",
+    msg: "🙋 正在為您轉接真人客服...\n\n⏳ 預計等待：3–5 分鐘\n📞 或直接撥打：04-2345-6789\n⏰ 服務時間：週一至週六 09:00-18:00\n\n感謝您的耐心，我們馬上為您服務！",
     opts: [{ label: "🏠 繼續自助服務", next: "start" }],
   },
 };
@@ -606,12 +606,28 @@ function JobsPage({ onNavigate }) {
 /* ═══════════════════════════════════════════
    POST JOB PAGE
 ═══════════════════════════════════════════ */
+function PostField({ label, field, placeholder, type = "text", form, update }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>{label}</label>
+      <input
+        type={type}
+        value={form[field]}
+        onChange={e => update(field, e.target.value)}
+        placeholder={placeholder}
+        style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "11px 14px", fontSize: 14, outline: "none", fontFamily: "inherit", transition: "border 0.2s" }}
+        onFocus={e => e.target.style.borderColor = DS.green}
+        onBlur={e => e.target.style.borderColor = DS.gray300}
+      />
+    </div>
+  );
+}
+
 function PostPage({ onSaveRecord, onNavigate }) {
-  const [step, setStep] = useState(0);
   const [form, setForm] = useState({ company: "", position: "", count: "", wage: "", location: "", date: "", contact: "", notes: "" });
   const [submitted, setSubmitted] = useState(false);
 
-  const update = (k, v) => setForm(p => ({ ...p, [k]: v }));
+  const update = useCallback((k, v) => setForm(p => ({ ...p, [k]: v })), []);
 
   const submit = () => {
     const rec = { id: genId(), type: "employer", time: new Date().toLocaleString("zh-TW"), data: form, status: "審核中" };
@@ -626,21 +642,10 @@ function PostPage({ onSaveRecord, onNavigate }) {
       <div style={{ fontSize: 20, fontWeight: 800, color: DS.navy, textAlign: "center" }}>職缺刊登成功！</div>
       <div style={{ fontSize: 14, color: DS.gray500, textAlign: "center", lineHeight: 1.7 }}>我們將在 1 個工作天內審核並上架<br />顧問會主動聯繫您確認細節</div>
       <div style={{ background: DS.greenLight, borderRadius: 14, padding: "14px 18px", width: "100%", maxWidth: 320 }}>
-        <div style={{ fontSize: 13, color: DS.navy }}>📞 緊急聯繫：0934011029</div>
+        <div style={{ fontSize: 13, color: DS.navy }}>📞 緊急聯繫：04-2345-6789</div>
         <div style={{ fontSize: 13, color: DS.navy, marginTop: 4 }}>⏰ 服務：週一至週六 09-18 時</div>
       </div>
-      <button onClick={() => { setSubmitted(false); setStep(0); setForm({ company: "", position: "", count: "", wage: "", location: "", date: "", contact: "", notes: "" }); onNavigate("home"); }} style={{ background: DS.green, color: DS.white, border: "none", borderRadius: 24, padding: "12px 32px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>回首頁</button>
-    </div>
-  );
-
-  const Field = ({ label, field, placeholder, type = "text" }) => (
-    <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>{label}</label>
-      <input type={type} value={form[field]} onChange={e => update(field, e.target.value)} placeholder={placeholder}
-        style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "11px 14px", fontSize: 14, outline: "none", fontFamily: "inherit", transition: "border 0.2s" }}
-        onFocus={e => e.target.style.borderColor = DS.green}
-        onBlur={e => e.target.style.borderColor = DS.gray300}
-      />
+      <button onClick={() => { setSubmitted(false); setForm({ company: "", position: "", count: "", wage: "", location: "", date: "", contact: "", notes: "" }); onNavigate("home"); }} style={{ background: DS.green, color: DS.white, border: "none", borderRadius: 24, padding: "12px 32px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>回首頁</button>
     </div>
   );
 
@@ -659,8 +664,8 @@ function PostPage({ onSaveRecord, onNavigate }) {
       </div>
 
       <div style={{ padding: "20px 16px" }}>
-        <Field label="公司名稱 *" field="company" placeholder="例：台中XX有限公司" />
-        <Field label="職缺名稱 *" field="position" placeholder="例：倉儲搬運人員" />
+        <PostField label="公司名稱 *" field="company" placeholder="例：台中XX有限公司" form={form} update={update} />
+        <PostField label="職缺名稱 *" field="position" placeholder="例：倉儲搬運人員" form={form} update={update} />
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>需要人數 *</label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -669,10 +674,10 @@ function PostPage({ onSaveRecord, onNavigate }) {
             ))}
           </div>
         </div>
-        <Field label="日薪（元/天）*" field="wage" placeholder="例：1500" type="number" />
-        <Field label="工作地點 *" field="location" placeholder="例：北屯區旱溪東路" />
-        <Field label="出勤日期" field="date" placeholder="例：2026/04/10 或 長期" />
-        <Field label="聯絡人 & 電話 *" field="contact" placeholder="例：陳經理 0912345678" />
+        <PostField label="日薪（元/天）*" field="wage" placeholder="例：1500" type="number" form={form} update={update} />
+        <PostField label="工作地點 *" field="location" placeholder="例：北屯區旱溪東路" form={form} update={update} />
+        <PostField label="出勤日期" field="date" placeholder="例：2026/04/10 或 長期" form={form} update={update} />
+        <PostField label="聯絡人 & 電話 *" field="contact" placeholder="例：陳經理 0912345678" form={form} update={update} />
         <div style={{ marginBottom: 20 }}>
           <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>備註（選填）</label>
           <textarea value={form.notes} onChange={e => update("notes", e.target.value)} placeholder="工作內容說明、特殊需求等"
@@ -702,13 +707,13 @@ function AdminPage({ records, onUpdateStatus }) {
       <div style={{ fontSize: 40 }}>🔐</div>
       <div style={{ fontWeight: 800, fontSize: 18, color: DS.navy }}>後台管理</div>
       <div style={{ fontSize: 13, color: DS.gray500 }}>請輸入管理密碼</div>
-      <input type="password" value={pw} onChange={e => setPw(e.target.value)} placeholder="密碼" onKeyDown={e => e.key === "Enter" && (pw === "5568" ? setAuth(true) : alert("密碼錯誤"))}
+      <input type="password" value={pw} onChange={e => setPw(e.target.value)} placeholder="密碼" onKeyDown={e => e.key === "Enter" && (pw === "admin888" ? setAuth(true) : alert("密碼錯誤"))}
         style={{ border: `1.5px solid ${DS.gray300}`, borderRadius: 24, padding: "12px 20px", fontSize: 15, outline: "none", width: "100%", maxWidth: 280, fontFamily: "inherit", textAlign: "center" }} />
-      <button onClick={() => pw === "5568" ? setAuth(true) : alert("密碼錯誤，預設：5568")}
+      <button onClick={() => pw === "admin888" ? setAuth(true) : alert("密碼錯誤，預設：admin888")}
         style={{ background: DS.navy, color: DS.white, border: "none", borderRadius: 24, padding: "12px 36px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
         登入
       </button>
-      <div style={{ fontSize: 11, color: DS.gray300 }}>預設密碼：5568</div>
+      <div style={{ fontSize: 11, color: DS.gray300 }}>預設密碼：admin888</div>
     </div>
   );
 
