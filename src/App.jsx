@@ -104,7 +104,7 @@ const FLOWS = {
     ],
   },
   js_done: {
-    msg: "🎉 登記完成！\n\n我們的顧問將在 **2小時內** 主動聯繫您，為您推薦最適合的日領職缺！\n\n📞 有急事請撥：04-2345-6789\n⏰ 服務時間：週一至週六 09:00-18:00\n\n祝您找到心目中的好工作！💪",
+    msg: "🎉 登記完成！\n\n我們的顧問將在 **2小時內** 主動聯繫您，為您推薦最適合的日領職缺！\n\n📞 有急事請撥：0934011029\n⏰ 服務時間：週一至週六 09:00-18:00\n\n祝您找到心目中的好工作！💪",
     opts: [
       { label: "🏠 回主選單", next: "start" },
       { label: "🗺️ 繼續查看職缺", next: "js_area_browse" },
@@ -137,7 +137,7 @@ const FLOWS = {
     ],
   },
   emp_urgent: {
-    msg: "🚨 緊急補班服務：\n\n我們提供 4小時內 快速到位服務！\n\n📞 緊急專線：04-2345-6789\n⏰ 緊急服務：07:00-22:00（含假日）\n\n請留下需求，顧問立即處理 👇",
+    msg: "🚨 緊急補班服務：\n\n我們提供 4小時內 快速到位服務！\n\n📞 緊急專線：0934011029\n⏰ 緊急服務：07:00-22:00（含假日）\n\n請留下需求，顧問立即處理 👇",
     opts: [
       { label: "📝 填寫緊急需求", next: "emp_company" },
       { label: "📞 直接電話聯繫", next: "human" },
@@ -173,7 +173,7 @@ const FLOWS = {
     input: { placeholder: "例：陳經理 0912345678", save: "contact", next: "emp_done" },
   },
   emp_done: {
-    msg: "✅ 職缺資料收到！\n\n系統已進入審核流程，通常在 **1個工作天內** 完成審核並為您推薦求職者。\n\n📋 顧問將主動聯繫您確認細節\n📞 有急事請撥：04-2345-6789\n\n感謝您選擇台中日領現金工作站！🙏",
+    msg: "✅ 職缺資料收到！\n\n系統已進入審核流程，通常在 **1個工作天內** 完成審核並為您推薦求職者。\n\n📋 顧問將主動聯繫您確認細節\n📞 有急事請撥：0934011029\n\n感謝您選擇台中日領現金工作站！🙏",
     opts: [
       { label: "🏠 回主選單", next: "start" },
       { label: "🚨 我有緊急需求", next: "emp_urgent" },
@@ -213,7 +213,7 @@ const FLOWS = {
     ],
   },
   human: {
-    msg: "🙋 正在為您轉接真人客服...\n\n⏳ 預計等待：3–5 分鐘\n📞 或直接撥打：04-2345-6789\n⏰ 服務時間：週一至週六 09:00-18:00\n\n感謝您的耐心，我們馬上為您服務！",
+    msg: "🙋 正在為您轉接真人客服...\n\n⏳ 預計等待：3–5 分鐘\n📞 或直接撥打：0934011029\n⏰ 服務時間：週一至週六 09:00-18:00\n\n感謝您的耐心，我們馬上為您服務！",
     opts: [{ label: "🏠 繼續自助服務", next: "start" }],
   },
 };
@@ -642,7 +642,7 @@ function PostPage({ onSaveRecord, onNavigate }) {
       <div style={{ fontSize: 20, fontWeight: 800, color: DS.navy, textAlign: "center" }}>職缺刊登成功！</div>
       <div style={{ fontSize: 14, color: DS.gray500, textAlign: "center", lineHeight: 1.7 }}>我們將在 1 個工作天內審核並上架<br />顧問會主動聯繫您確認細節</div>
       <div style={{ background: DS.greenLight, borderRadius: 14, padding: "14px 18px", width: "100%", maxWidth: 320 }}>
-        <div style={{ fontSize: 13, color: DS.navy }}>📞 緊急聯繫：04-2345-6789</div>
+        <div style={{ fontSize: 13, color: DS.navy }}>📞 緊急聯繫：0934011029</div>
         <div style={{ fontSize: 13, color: DS.navy, marginTop: 4 }}>⏰ 服務：週一至週六 09-18 時</div>
       </div>
       <button onClick={() => { setSubmitted(false); setForm({ company: "", position: "", count: "", wage: "", location: "", date: "", contact: "", notes: "" }); onNavigate("home"); }} style={{ background: DS.green, color: DS.white, border: "none", borderRadius: 24, padding: "12px 32px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>回首頁</button>
@@ -707,9 +707,9 @@ function AdminPage({ records, onUpdateStatus }) {
       <div style={{ fontSize: 40 }}>🔐</div>
       <div style={{ fontWeight: 800, fontSize: 18, color: DS.navy }}>後台管理</div>
       <div style={{ fontSize: 13, color: DS.gray500 }}>請輸入管理密碼</div>
-      <input type="password" value={pw} onChange={e => setPw(e.target.value)} placeholder="密碼" onKeyDown={e => e.key === "Enter" && (pw === "admin888" ? setAuth(true) : alert("密碼錯誤"))}
+      <input type="password" value={pw} onChange={e => setPw(e.target.value)} placeholder="密碼" onKeyDown={e => e.key === "Enter" && (pw === "5568" ? setAuth(true) : alert("密碼錯誤"))}
         style={{ border: `1.5px solid ${DS.gray300}`, borderRadius: 24, padding: "12px 20px", fontSize: 15, outline: "none", width: "100%", maxWidth: 280, fontFamily: "inherit", textAlign: "center" }} />
-      <button onClick={() => pw === "admin888" ? setAuth(true) : alert("密碼錯誤，預設：admin888")}
+      <button onClick={() => pw === "5568" ? setAuth(true) : alert("密碼錯誤，預設：admin888")}
         style={{ background: DS.navy, color: DS.white, border: "none", borderRadius: 24, padding: "12px 36px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
         登入
       </button>
