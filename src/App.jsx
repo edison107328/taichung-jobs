@@ -604,7 +604,7 @@ function JobsPage({ onNavigate }) {
 }
 
 /* ═══════════════════════════════════════════
-   POST JOB PAGE
+   POST JOB PAGE — UPGRADED
 ═══════════════════════════════════════════ */
 function PostField({ label, field, placeholder, type = "text", form, update }) {
   return (
@@ -623,14 +623,190 @@ function PostField({ label, field, placeholder, type = "text", form, update }) {
   );
 }
 
+// 班次時間滾輪選擇器
+const TIME_SLOTS = [
+  "06:00–10:00","07:00–11:00","08:00–12:00","09:00–13:00",
+  "10:00–14:00","11:00–15:00","12:00–16:00","13:00–17:00",
+  "14:00–18:00","15:00–19:00","16:00–20:00","17:00–21:00",
+  "18:00–22:00","19:00–23:00","22:00–02:00","00:00–04:00",
+];
+
+function TimeSlotPicker({ value, onChange }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>
+        ⏰ 班次時間（4小時/班）*
+      </label>
+      <div style={{ overflowX: "auto", paddingBottom: 4 }}>
+        <div style={{ display: "flex", gap: 8, width: "max-content" }}>
+          {TIME_SLOTS.map(slot => (
+            <button key={slot} onClick={() => onChange(slot)} style={{
+              background: value === slot ? DS.green : DS.gray100,
+              color: value === slot ? DS.white : DS.navy,
+              border: value === slot ? `1.5px solid ${DS.green}` : `1.5px solid ${DS.gray300}`,
+              borderRadius: 20, padding: "7px 14px", fontSize: 12.5,
+              cursor: "pointer", whiteSpace: "nowrap", fontWeight: value === slot ? 700 : 400,
+              transition: "all 0.15s"
+            }}>{slot}</button>
+          ))}
+        </div>
+      </div>
+      {value && (
+        <div style={{ marginTop: 6, background: DS.greenLight, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: DS.greenDark, fontWeight: 600 }}>
+          ✅ 已選：{value}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Google Maps 地點選擇
+function LocationPicker({ value, onChange }) {
+  const openGoogleMaps = () => {
+    window.open("https://maps.google.com?q=台中市", "_blank");
+  };
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>
+        📍 工作地點 *
+      </label>
+      <div style={{ display: "flex", gap: 8 }}>
+        <input
+          type="text"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder="輸入地址或點右側地圖選取"
+          style={{ flex: 1, border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "11px 14px", fontSize: 14, outline: "none", fontFamily: "inherit", transition: "border 0.2s" }}
+          onFocus={e => e.target.style.borderColor = DS.green}
+          onBlur={e => e.target.style.borderColor = DS.gray300}
+        />
+        <button onClick={openGoogleMaps} style={{
+          background: DS.navy, color: DS.white, border: "none", borderRadius: 10,
+          padding: "0 14px", fontSize: 18, cursor: "pointer", flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }} title="開啟 Google Maps">🗺️</button>
+      </div>
+      <div style={{ fontSize: 11, color: DS.gray500, marginTop: 4 }}>
+        💡 點地圖圖示可開啟 Google Maps 查詢地址，再複製貼回
+      </div>
+    </div>
+  );
+}
+
+// 日期選擇器（連動手機日曆）
+function DatePicker({ value, onChange }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>
+        📅 出勤日期
+      </label>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+        {["今天", "明天", "本週末", "長期"].map(d => {
+          const getDate = () => {
+            const today = new Date();
+            if (d === "今天") return today.toISOString().split("T")[0];
+            if (d === "明天") { today.setDate(today.getDate()+1); return today.toISOString().split("T")[0]; }
+            if (d === "本週末") {
+              const day = today.getDay();
+              const sat = new Date(today); sat.setDate(today.getDate() + (6 - day));
+              return sat.toISOString().split("T")[0];
+            }
+            return "長期";
+          };
+          const dateVal = getDate();
+          return (
+            <button key={d} onClick={() => onChange(dateVal)} style={{
+              background: value === dateVal ? DS.green : DS.gray100,
+              color: value === dateVal ? DS.white : DS.navy,
+              border: "none", borderRadius: 18, padding: "6px 14px",
+              fontSize: 12, cursor: "pointer", fontWeight: value === dateVal ? 700 : 400
+            }}>{d}</button>
+          );
+        })}
+      </div>
+      <input
+        type="date"
+        value={value === "長期" ? "" : value}
+        onChange={e => onChange(e.target.value)}
+        min={new Date().toISOString().split("T")[0]}
+        style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "11px 14px", fontSize: 14, outline: "none", fontFamily: "inherit", color: DS.navy }}
+        onFocus={e => e.target.style.borderColor = DS.green}
+        onBlur={e => e.target.style.borderColor = DS.gray300}
+      />
+      {value === "長期" && (
+        <div style={{ marginTop: 6, background: DS.greenLight, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: DS.greenDark, fontWeight: 600 }}>✅ 長期職缺</div>
+      )}
+    </div>
+  );
+}
+
+// 電話輸入（只需輸入後8碼）
+function PhoneInput({ value, onChange }) {
+  const handleChange = (e) => {
+    let v = e.target.value.replace(/\D/g, "").slice(0, 8);
+    onChange(v);
+  };
+  const displayPhone = value.length === 8 ? `0${value.slice(0,2)}-${value.slice(2,6)}-${value.slice(6)}` : value ? `09${value}` : "";
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>
+        📞 聯絡人姓名
+      </label>
+      <PostField label="" field="contactName" placeholder="例：陳經理" form={{ contactName: value.split("|")[0] || "" }} update={(_, v) => onChange(v + "|" + (value.split("|")[1] || ""))} />
+      <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5, marginTop: 8 }}>
+        📱 手機號碼（只輸入後8碼）*
+      </label>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ background: DS.gray100, borderRadius: 10, padding: "11px 12px", fontSize: 14, color: DS.gray500, border: `1.5px solid ${DS.gray300}`, flexShrink: 0, fontWeight: 700 }}>09</div>
+        <input
+          type="tel"
+          inputMode="numeric"
+          maxLength={8}
+          value={value.split("|")[1] || ""}
+          onChange={e => {
+            const digits = e.target.value.replace(/\D/g, "").slice(0, 8);
+            onChange((value.split("|")[0] || "") + "|" + digits);
+          }}
+          placeholder="XX-XXXX-XX"
+          style={{ flex: 1, border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "11px 14px", fontSize: 14, outline: "none", fontFamily: "inherit", letterSpacing: 2 }}
+          onFocus={e => e.target.style.borderColor = DS.green}
+          onBlur={e => e.target.style.borderColor = DS.gray300}
+        />
+      </div>
+      {(value.split("|")[1] || "").length === 8 && (
+        <div style={{ marginTop: 6, background: DS.greenLight, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: DS.greenDark, fontWeight: 600 }}>
+          ✅ 完整號碼：09{value.split("|")[1]}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PostPage({ onSaveRecord, onNavigate }) {
-  const [form, setForm] = useState({ company: "", position: "", count: "", wage: "", location: "", date: "", contact: "", notes: "" });
+  const [form, setForm] = useState({
+    company: "", position: "", count: "", wage: "",
+    timeSlot: "", location: "", date: "", contact: "", notes: ""
+  });
   const [submitted, setSubmitted] = useState(false);
 
   const update = useCallback((k, v) => setForm(p => ({ ...p, [k]: v })), []);
 
+  const getContactDisplay = () => {
+    const parts = (form.contact || "").split("|");
+    const name = parts[0] || "";
+    const phone = parts[1] || "";
+    return phone.length === 8 ? `${name} 09${phone}` : name;
+  };
+
+  const canSubmit = form.company && form.position && form.count && form.wage && form.timeSlot && form.location && form.contact;
+
   const submit = () => {
-    const rec = { id: genId(), type: "employer", time: new Date().toLocaleString("zh-TW"), data: form, status: "審核中" };
+    const rec = {
+      id: genId(), type: "employer",
+      time: new Date().toLocaleString("zh-TW"),
+      data: { ...form, contact: getContactDisplay() },
+      status: "審核中"
+    };
     onSaveRecord(rec);
     saveRecord(rec);
     setSubmitted(true);
@@ -640,12 +816,19 @@ function PostPage({ onSaveRecord, onNavigate }) {
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 28, gap: 16 }}>
       <div style={{ fontSize: 56 }}>✅</div>
       <div style={{ fontSize: 20, fontWeight: 800, color: DS.navy, textAlign: "center" }}>職缺刊登成功！</div>
-      <div style={{ fontSize: 14, color: DS.gray500, textAlign: "center", lineHeight: 1.7 }}>我們將在 1 個工作天內審核並上架<br />顧問會主動聯繫您確認細節</div>
+      <div style={{ fontSize: 14, color: DS.gray500, textAlign: "center", lineHeight: 1.8 }}>
+        職缺：{form.position}<br />
+        班次：{form.timeSlot}<br />
+        地點：{form.location}
+      </div>
       <div style={{ background: DS.greenLight, borderRadius: 14, padding: "14px 18px", width: "100%", maxWidth: 320 }}>
-        <div style={{ fontSize: 13, color: DS.navy }}>📞 緊急聯繫：04-2345-6789</div>
+        <div style={{ fontSize: 13, color: DS.navy }}>📞 顧問將在1個工作天內聯繫您</div>
         <div style={{ fontSize: 13, color: DS.navy, marginTop: 4 }}>⏰ 服務：週一至週六 09-18 時</div>
       </div>
-      <button onClick={() => { setSubmitted(false); setForm({ company: "", position: "", count: "", wage: "", location: "", date: "", contact: "", notes: "" }); onNavigate("home"); }} style={{ background: DS.green, color: DS.white, border: "none", borderRadius: 24, padding: "12px 32px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>回首頁</button>
+      <button onClick={() => { setSubmitted(false); setForm({ company: "", position: "", count: "", wage: "", timeSlot: "", location: "", date: "", contact: "", notes: "" }); onNavigate("home"); }}
+        style={{ background: DS.green, color: DS.white, border: "none", borderRadius: 24, padding: "12px 32px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+        回首頁
+      </button>
     </div>
   );
 
@@ -655,38 +838,88 @@ function PostPage({ onSaveRecord, onNavigate }) {
         <div style={{ color: DS.white, fontWeight: 800, fontSize: 16 }}>🏢 企業刊登職缺</div>
         <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, marginTop: 3 }}>刊登完全免費 · 1個工作天審核上架</div>
       </div>
-
-      {/* Pricing info */}
-      <div style={{ background: DS.goldLight, padding: "12px 16px", borderBottom: "1px solid #fde8a0" }}>
-        <div style={{ fontSize: 12, color: DS.navy, lineHeight: 1.7 }}>
-          💼 <strong>收費說明</strong>：刊登免費，成功媒合後收日薪15%服務費（雇主付）
-        </div>
+      <div style={{ background: DS.goldLight, padding: "10px 16px", borderBottom: "1px solid #fde8a0", fontSize: 12, color: DS.navy }}>
+        💼 成功媒合後收日薪15%服務費（雇主付）
       </div>
 
-      <div style={{ padding: "20px 16px" }}>
+      <div style={{ padding: "18px 16px" }}>
         <PostField label="公司名稱 *" field="company" placeholder="例：台中XX有限公司" form={form} update={update} />
         <PostField label="職缺名稱 *" field="position" placeholder="例：倉儲搬運人員" form={form} update={update} />
+
+        {/* 人數 */}
         <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>需要人數 *</label>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 6 }}>👥 需要人數 *</label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["1人", "2-3人", "4-10人", "10人以上"].map(c => (
-              <button key={c} onClick={() => update("count", c)} style={{ background: form.count === c ? DS.green : DS.gray100, color: form.count === c ? DS.white : DS.navy, border: "none", borderRadius: 10, padding: "9px 16px", fontSize: 13, cursor: "pointer", fontFamily: "inherit", fontWeight: form.count === c ? 700 : 400 }}>{c}</button>
+              <button key={c} onClick={() => update("count", c)} style={{
+                background: form.count === c ? DS.green : DS.gray100,
+                color: form.count === c ? DS.white : DS.navy,
+                border: "none", borderRadius: 10, padding: "9px 16px",
+                fontSize: 13, cursor: "pointer", fontWeight: form.count === c ? 700 : 400
+              }}>{c}</button>
             ))}
           </div>
         </div>
-        <PostField label="日薪（元/天）*" field="wage" placeholder="例：1500" type="number" form={form} update={update} />
-        <PostField label="工作地點 *" field="location" placeholder="例：北屯區旱溪東路" form={form} update={update} />
-        <PostField label="出勤日期" field="date" placeholder="例：2026/04/10 或 長期" form={form} update={update} />
-        <PostField label="聯絡人 & 電話 *" field="contact" placeholder="例：陳經理 0912345678" form={form} update={update} />
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>備註（選填）</label>
-          <textarea value={form.notes} onChange={e => update("notes", e.target.value)} placeholder="工作內容說明、特殊需求等"
-            style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "11px 14px", fontSize: 14, outline: "none", fontFamily: "inherit", minHeight: 80, resize: "vertical" }} />
+
+        {/* 日薪 */}
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 6 }}>💰 日薪（元/天）*</label>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <div style={{ background: DS.gray100, borderRadius: 10, padding: "11px 12px", fontSize: 14, color: DS.gray500, border: `1.5px solid ${DS.gray300}`, flexShrink: 0 }}>$</div>
+            <input
+              type="number"
+              value={form.wage}
+              onChange={e => update("wage", e.target.value)}
+              placeholder="例：1500"
+              min="800" max="9999" step="100"
+              style={{ flex: 1, border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "11px 14px", fontSize: 14, outline: "none", fontFamily: "inherit" }}
+              onFocus={e => e.target.style.borderColor = DS.green}
+              onBlur={e => e.target.style.borderColor = DS.gray300}
+            />
+            <div style={{ fontSize: 13, color: DS.gray500, flexShrink: 0 }}>元</div>
+          </div>
+          {form.wage && (
+            <div style={{ marginTop: 6, display: "flex", gap: 8 }}>
+              {["1200","1500","1800","2000","2500"].map(w => (
+                <button key={w} onClick={() => update("wage", w)} style={{
+                  background: form.wage === w ? DS.green : DS.gray100,
+                  color: form.wage === w ? DS.white : DS.navy,
+                  border: "none", borderRadius: 16, padding: "4px 10px", fontSize: 11, cursor: "pointer"
+                }}>${w}</button>
+              ))}
+            </div>
+          )}
         </div>
 
-        <button onClick={submit} disabled={!form.company || !form.position || !form.count || !form.wage || !form.location || !form.contact}
-          style={{ width: "100%", background: (form.company && form.position && form.count && form.wage && form.location && form.contact) ? DS.green : DS.gray300, color: DS.white, border: "none", borderRadius: 28, padding: "15px", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-          提交職缺申請 →
+        {/* 班次時間滾輪 */}
+        <TimeSlotPicker value={form.timeSlot} onChange={v => update("timeSlot", v)} />
+
+        {/* Google Maps 地點 */}
+        <LocationPicker value={form.location} onChange={v => update("location", v)} />
+
+        {/* 日期選擇器 */}
+        <DatePicker value={form.date} onChange={v => update("date", v)} />
+
+        {/* 電話輸入 */}
+        <PhoneInput value={form.contact} onChange={v => update("contact", v)} />
+
+        {/* 備註 */}
+        <div style={{ marginBottom: 18 }}>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: DS.navy, marginBottom: 5 }}>備註（選填）</label>
+          <textarea
+            value={form.notes}
+            onChange={e => update("notes", e.target.value)}
+            placeholder="工作內容說明、特殊需求、注意事項..."
+            style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "11px 14px", fontSize: 14, outline: "none", fontFamily: "inherit", minHeight: 75, resize: "vertical" }}
+          />
+        </div>
+
+        <button onClick={submit} disabled={!canSubmit} style={{
+          width: "100%", background: canSubmit ? DS.green : DS.gray300,
+          color: DS.white, border: "none", borderRadius: 26, padding: "14px",
+          fontSize: 15, fontWeight: 700, cursor: canSubmit ? "pointer" : "default"
+        }}>
+          {canSubmit ? "提交職缺申請 →" : "請填寫必填欄位（*）"}
         </button>
       </div>
     </div>
@@ -836,6 +1069,7 @@ export default function App() {
     { key: "jobs", icon: "📋", label: "職缺" },
     { key: "chat", icon: "💬", label: "客服" },
     { key: "post", icon: "🏢", label: "刊登" },
+    { key: "insure", icon: "🛡️", label: "投保" },
     { key: "admin", icon: "🗂️", label: "後台" },
   ];
 
@@ -847,8 +1081,9 @@ export default function App() {
         ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+        @keyframes shieldPulse { 0%,100%{box-shadow:0 0 0 0 rgba(6,199,85,0.4)} 50%{box-shadow:0 0 0 12px rgba(6,199,85,0)} }
       `}</style>
 
       {/* Top header */}
@@ -856,7 +1091,7 @@ export default function App() {
         <div style={{ width: 36, height: 36, borderRadius: "50%", background: DS.green, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>💼</div>
         <div>
           <div style={{ color: DS.white, fontWeight: 800, fontSize: 14 }}>台中日領現金工作站</div>
-          <div style={{ color: DS.green, fontSize: 10, fontWeight: 600 }}>當日工作 · 當日領現</div>
+          <div style={{ color: DS.green, fontSize: 10, fontWeight: 600 }}>當日工作 · 當日領現 · 當日投保</div>
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{ width: 7, height: 7, borderRadius: "50%", background: DS.green, animation: "pulse 2s infinite" }} />
@@ -866,22 +1101,364 @@ export default function App() {
 
       {/* Page content */}
       <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
-        {page === "home" && <LandingPage onNavigate={setPage} />}
-        {page === "chat" && <ChatPage onSaveRecord={saveRec} />}
-        {page === "jobs" && <JobsPage onNavigate={setPage} />}
-        {page === "post" && <PostPage onSaveRecord={saveRec} onNavigate={setPage} />}
-        {page === "admin" && <AdminPage records={records} onUpdateStatus={updateStatus} />}
+        {page === "home"   && <LandingPage onNavigate={setPage} />}
+        {page === "chat"   && <ChatPage onSaveRecord={saveRec} />}
+        {page === "jobs"   && <JobsPage onNavigate={setPage} />}
+        {page === "post"   && <PostPage onSaveRecord={saveRec} onNavigate={setPage} />}
+        {page === "insure" && <InsurancePage onSaveRecord={saveRec} />}
+        {page === "admin"  && <AdminPage records={records} onUpdateStatus={updateStatus} />}
       </div>
 
       {/* Bottom nav */}
       <div style={{ background: DS.white, borderTop: `1px solid ${DS.gray100}`, display: "flex", flexShrink: 0, boxShadow: "0 -4px 20px rgba(0,0,0,0.08)" }}>
         {NAV.map(n => (
-          <button key={n.key} onClick={() => setPage(n.key)} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", padding: "10px 0 12px", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-            <span style={{ fontSize: page === n.key ? 22 : 20, transition: "font-size 0.15s" }}>{n.icon}</span>
-            <span style={{ fontSize: 10, color: page === n.key ? DS.green : DS.gray500, fontWeight: page === n.key ? 700 : 400, fontFamily: "inherit" }}>{n.label}</span>
-            {page === n.key && <div style={{ width: 20, height: 2.5, borderRadius: 2, background: DS.green }} />}
+          <button key={n.key} onClick={() => setPage(n.key)} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", padding: "8px 0 10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, position: "relative" }}>
+            {n.key === "insure" && (
+              <div style={{ position: "absolute", top: 4, right: "18%", width: 7, height: 7, borderRadius: "50%", background: DS.red, border: "1.5px solid #fff" }} />
+            )}
+            <span style={{ fontSize: page === n.key ? 21 : 19 }}>{n.icon}</span>
+            <span style={{ fontSize: 10, color: page === n.key ? DS.green : DS.gray500, fontWeight: page === n.key ? 700 : 400 }}>{n.label}</span>
+            {page === n.key && <div style={{ width: 18, height: 2.5, borderRadius: 2, background: DS.green }} />}
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   INSURANCE PAGE — 當日投保系統
+═══════════════════════════════════════════ */
+function saveInsurance(rec) {
+  try {
+    const list = JSON.parse(localStorage.getItem("tc_insurance") || "[]");
+    list.unshift(rec);
+    localStorage.setItem("tc_insurance", JSON.stringify(list.slice(0, 500)));
+  } catch(e) {}
+}
+function loadInsurance() {
+  try { return JSON.parse(localStorage.getItem("tc_insurance") || "[]"); } catch { return []; }
+}
+
+function InsurancePage({ onSaveRecord }) {
+  const [step, setStep] = useState(0); // 0=說明 1=填表 2=確認 3=完成
+  const [form, setForm] = useState({
+    name: "", idNo: "", birthday: "", phone: "",
+    jobTitle: "", employer: "", workDate: "", timeSlot: "",
+    wage: "", location: "", confirmed: false,
+  });
+  const [records, setRecords] = useState(() => loadInsurance());
+  const [tab, setTab] = useState("apply"); // apply | history
+  const upd = useCallback((k,v) => setForm(p => ({...p, [k]: v})), []);
+
+  const today = new Date().toISOString().split("T")[0];
+  const canSubmit = form.name && form.idNo && form.phone && form.jobTitle && form.employer && form.workDate && form.timeSlot && form.wage && form.confirmed;
+
+  const submit = () => {
+    const rec = {
+      id: "INS" + Date.now().toString(36).toUpperCase(),
+      type: "insurance",
+      time: new Date().toLocaleString("zh-TW"),
+      workDate: form.workDate,
+      data: { ...form },
+      status: "投保申請中",
+    };
+    saveInsurance(rec);
+    setRecords(p => [rec, ...p]);
+    onSaveRecord(rec);
+    setStep(3);
+  };
+
+  const statusColor = s => s === "已完成" ? DS.green : s === "投保中" ? DS.gold : s === "投保申請中" ? DS.navy : DS.red;
+
+  if (tab === "history") return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <div style={{ background: DS.navy, padding: "14px 16px", flexShrink: 0 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ color: DS.white, fontWeight: 800, fontSize: 15 }}>🛡️ 投保紀錄</div>
+          <button onClick={() => setTab("apply")} style={{ background: DS.green, color: DS.white, border: "none", borderRadius: 16, padding: "6px 14px", fontSize: 12, cursor: "pointer" }}>+ 新申請</button>
+        </div>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px" }}>
+        {records.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 40, color: DS.gray500 }}>
+            <div style={{ fontSize: 36, marginBottom: 10 }}>📋</div>
+            <div>尚無投保紀錄</div>
+          </div>
+        ) : records.map(r => (
+          <div key={r.id} style={{ background: DS.white, borderRadius: 14, padding: "14px", marginBottom: 10, boxShadow: DS.shadow, borderLeft: `4px solid ${statusColor(r.status)}` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: DS.navy }}>{r.data.name}</div>
+                <div style={{ fontSize: 11, color: DS.gray500 }}>#{r.id} · {r.time}</div>
+              </div>
+              <span style={{ background: statusColor(r.status) + "18", color: statusColor(r.status), borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700, height: "fit-content" }}>{r.status}</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+              <InfoChip label="工作日期" val={r.data.workDate} />
+              <InfoChip label="班次" val={r.data.timeSlot} />
+              <InfoChip label="職缺" val={r.data.jobTitle} />
+              <InfoChip label="日薪" val={`$${r.data.wage}`} />
+              <InfoChip label="雇主" val={r.data.employer} />
+              <InfoChip label="身分證" val={r.data.idNo.slice(0,3) + "****" + r.data.idNo.slice(-3)} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // 步驟 0：說明
+  if (step === 0) return (
+    <div style={{ height: "100%", overflowY: "auto" }}>
+      <div style={{ background: `linear-gradient(135deg, #0D1B3E, #1a3060)`, padding: "28px 20px 32px", textAlign: "center" }}>
+        <div style={{ width: 70, height: 70, borderRadius: "50%", background: DS.green, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, margin: "0 auto 14px", animation: "shieldPulse 2s infinite" }}>🛡️</div>
+        <div style={{ color: DS.white, fontSize: 22, fontWeight: 800, marginBottom: 6 }}>當日勞工保險投保</div>
+        <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.8 }}>接到工作前必須完成投保<br />保障您的工作安全與權益</div>
+      </div>
+
+      {/* 重要說明 */}
+      <div style={{ padding: "20px 16px" }}>
+        <div style={{ background: "#FFF3CD", borderRadius: 14, padding: "14px 16px", marginBottom: 14, border: "1.5px solid #F5A623" }}>
+          <div style={{ fontWeight: 700, fontSize: 13, color: "#8B5E00", marginBottom: 6 }}>⚠️ 強制投保規定</div>
+          <div style={{ fontSize: 12, color: "#8B5E00", lineHeight: 1.8 }}>
+            依勞工保險條例規定，受僱勞工出勤當日必須完成投保。
+            <strong>未投保即出勤屬違法</strong>，發生意外將無法申請保險給付。
+          </div>
+        </div>
+
+        {[
+          { icon: "✅", title: "保障範圍", items: ["職業傷害醫療給付", "失能給付", "死亡給付", "生育給付"] },
+          { icon: "📋", title: "投保流程", items: ["填寫基本資料與工作資訊", "確認同意書", "系統送出申請", "顧問審核確認（10分鐘內）"] },
+          { icon: "⏰", title: "重要時間", items: ["投保申請：出勤前完成", "生效時間：當日 00:00 起", "截止時間：出勤前1小時", "費用：由雇主負擔"] },
+        ].map(s => (
+          <div key={s.title} style={{ background: DS.white, borderRadius: 14, padding: "14px", marginBottom: 10, boxShadow: DS.shadow }}>
+            <div style={{ fontWeight: 700, fontSize: 14, color: DS.navy, marginBottom: 8 }}>{s.icon} {s.title}</div>
+            {s.items.map(item => (
+              <div key={item} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: DS.green, flexShrink: 0 }} />
+                <div style={{ fontSize: 13, color: DS.gray700 }}>{item}</div>
+              </div>
+            ))}
+          </div>
+        ))}
+
+        <div style={{ background: DS.navy, borderRadius: 14, padding: "16px", textAlign: "center", marginBottom: 14 }}>
+          <div style={{ color: DS.white, fontSize: 13, marginBottom: 10, lineHeight: 1.7 }}>
+            🔒 您的個人資料受到嚴格保護<br />僅用於勞保投保申請，不會外洩
+          </div>
+        </div>
+
+        <button onClick={() => setStep(1)} style={{ width: "100%", background: DS.green, color: DS.white, border: "none", borderRadius: 26, padding: "15px", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+          🛡️ 開始申請當日投保 →
+        </button>
+        <button onClick={() => setTab("history")} style={{ width: "100%", background: "none", color: DS.gray500, border: `1.5px solid ${DS.gray300}`, borderRadius: 26, padding: "12px", fontSize: 13, cursor: "pointer", marginTop: 10 }}>
+          查看投保紀錄
+        </button>
+      </div>
+    </div>
+  );
+
+  // 步驟 1：填表
+  if (step === 1) return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <div style={{ background: DS.navy, padding: "14px 16px", flexShrink: 0 }}>
+        <div style={{ color: DS.white, fontWeight: 800, fontSize: 15 }}>🛡️ 投保申請 — 填寫資料</div>
+        <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+          {["個人資料","工作資訊","確認送出"].map((s,i) => (
+            <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: i === 0 ? DS.green : "rgba(255,255,255,0.2)" }} />
+          ))}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+        <div style={{ background: "#FFF3CD", borderRadius: 10, padding: "10px 14px", marginBottom: 14, fontSize: 12, color: "#8B5E00" }}>
+          ⚠️ 請填寫與身分證完全相符的真實資料，資料錯誤將導致投保無效
+        </div>
+
+        {/* 個人資料 */}
+        <div style={{ background: DS.white, borderRadius: 14, padding: "16px", marginBottom: 12, boxShadow: DS.shadow }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: DS.navy, marginBottom: 12 }}>👤 個人資料</div>
+          {[
+            { label: "真實姓名 *", field: "name", placeholder: "與身分證相同" },
+            { label: "身分證字號 *", field: "idNo", placeholder: "A123456789" },
+            { label: "出生年月日 *", field: "birthday", placeholder: "", type: "date" },
+          ].map(f => (
+            <div key={f.field} style={{ marginBottom: 12 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: DS.navy, marginBottom: 4 }}>{f.label}</label>
+              <input
+                type={f.type || "text"}
+                value={form[f.field]}
+                onChange={e => upd(f.field, e.target.value)}
+                placeholder={f.placeholder}
+                style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "10px 13px", fontSize: 14, outline: "none" }}
+                onFocus={e => e.target.style.borderColor = DS.green}
+                onBlur={e => e.target.style.borderColor = DS.gray300}
+              />
+            </div>
+          ))}
+          <div style={{ marginBottom: 0 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: DS.navy, marginBottom: 4 }}>手機號碼（後8碼）*</label>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <div style={{ background: DS.gray100, borderRadius: 10, padding: "10px 12px", fontSize: 14, color: DS.gray500, border: `1.5px solid ${DS.gray300}`, flexShrink: 0, fontWeight: 700 }}>09</div>
+              <input
+                type="tel" inputMode="numeric" maxLength={8}
+                value={form.phone}
+                onChange={e => upd("phone", e.target.value.replace(/\D/g,"").slice(0,8))}
+                placeholder="XX-XXXX-XX"
+                style={{ flex: 1, border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "10px 13px", fontSize: 14, outline: "none", letterSpacing: 2 }}
+                onFocus={e => e.target.style.borderColor = DS.green}
+                onBlur={e => e.target.style.borderColor = DS.gray300}
+              />
+            </div>
+            {form.phone.length === 8 && <div style={{ marginTop: 4, fontSize: 11, color: DS.green }}>✅ 09{form.phone}</div>}
+          </div>
+        </div>
+
+        <button
+          onClick={() => form.name && form.idNo && form.birthday && form.phone.length === 8 ? setStep(2) : alert("請填寫完整個人資料")}
+          style={{ width: "100%", background: DS.green, color: DS.white, border: "none", borderRadius: 26, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+          下一步：填寫工作資訊 →
+        </button>
+        <button onClick={() => setStep(0)} style={{ width: "100%", background: "none", border: "none", color: DS.gray500, padding: "10px", fontSize: 13, cursor: "pointer", marginTop: 6 }}>← 返回</button>
+      </div>
+    </div>
+  );
+
+  // 步驟 2：工作資訊 + 確認
+  if (step === 2) return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <div style={{ background: DS.navy, padding: "14px 16px", flexShrink: 0 }}>
+        <div style={{ color: DS.white, fontWeight: 800, fontSize: 15 }}>🛡️ 投保申請 — 工作資訊</div>
+        <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+          {["個人資料","工作資訊","確認送出"].map((s,i) => (
+            <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= 1 ? DS.green : "rgba(255,255,255,0.2)" }} />
+          ))}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+        <div style={{ background: DS.white, borderRadius: 14, padding: "16px", marginBottom: 12, boxShadow: DS.shadow }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: DS.navy, marginBottom: 12 }}>💼 工作資訊</div>
+          {[
+            { label: "職缺名稱 *", field: "jobTitle", placeholder: "例：倉儲搬運人員" },
+            { label: "雇主/公司名稱 *", field: "employer", placeholder: "例：台中XX有限公司" },
+          ].map(f => (
+            <div key={f.field} style={{ marginBottom: 12 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: DS.navy, marginBottom: 4 }}>{f.label}</label>
+              <input
+                type="text" value={form[f.field]}
+                onChange={e => upd(f.field, e.target.value)}
+                placeholder={f.placeholder}
+                style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "10px 13px", fontSize: 14, outline: "none" }}
+                onFocus={e => e.target.style.borderColor = DS.green}
+                onBlur={e => e.target.style.borderColor = DS.gray300}
+              />
+            </div>
+          ))}
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: DS.navy, marginBottom: 4 }}>出勤日期 *</label>
+            <input type="date" value={form.workDate} min={today}
+              onChange={e => upd("workDate", e.target.value)}
+              style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "10px 13px", fontSize: 14, outline: "none", color: DS.navy }}
+              onFocus={e => e.target.style.borderColor = DS.green}
+              onBlur={e => e.target.style.borderColor = DS.gray300}
+            />
+            <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+              {["今天","明天"].map(d => {
+                const dt = new Date(); if(d==="明天") dt.setDate(dt.getDate()+1);
+                const val = dt.toISOString().split("T")[0];
+                return <button key={d} onClick={() => upd("workDate", val)} style={{ background: form.workDate===val ? DS.green : DS.gray100, color: form.workDate===val ? DS.white : DS.navy, border:"none", borderRadius:16, padding:"5px 14px", fontSize:12, cursor:"pointer", fontWeight: form.workDate===val ? 700 : 400 }}>{d}</button>;
+              })}
+            </div>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: DS.navy, marginBottom: 6 }}>班次時間 *</label>
+            <div style={{ overflowX: "auto", paddingBottom: 4 }}>
+              <div style={{ display: "flex", gap: 7, width: "max-content" }}>
+                {TIME_SLOTS.map(slot => (
+                  <button key={slot} onClick={() => upd("timeSlot", slot)} style={{
+                    background: form.timeSlot===slot ? DS.green : DS.gray100,
+                    color: form.timeSlot===slot ? DS.white : DS.navy,
+                    border: form.timeSlot===slot ? `1.5px solid ${DS.green}` : `1.5px solid ${DS.gray300}`,
+                    borderRadius: 18, padding: "6px 12px", fontSize: 12, cursor: "pointer", whiteSpace: "nowrap",
+                    fontWeight: form.timeSlot===slot ? 700 : 400
+                  }}>{slot}</button>
+                ))}
+              </div>
+            </div>
+            {form.timeSlot && <div style={{ marginTop: 6, fontSize: 12, color: DS.green, fontWeight: 600 }}>✅ {form.timeSlot}</div>}
+          </div>
+          <div>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: DS.navy, marginBottom: 4 }}>當日日薪 *</label>
+            <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 6 }}>
+              {["1200","1500","1800","2000","2500"].map(w => (
+                <button key={w} onClick={() => upd("wage", w)} style={{ background: form.wage===w ? DS.green : DS.gray100, color: form.wage===w ? DS.white : DS.navy, border:"none", borderRadius:16, padding:"6px 12px", fontSize:12, cursor:"pointer", fontWeight: form.wage===w ? 700 : 400 }}>${w}</button>
+              ))}
+            </div>
+            <input type="number" value={form.wage} onChange={e => upd("wage", e.target.value)} placeholder="或輸入金額"
+              style={{ width: "100%", border: `1.5px solid ${DS.gray300}`, borderRadius: 10, padding: "10px 13px", fontSize: 14, outline: "none" }}
+              onFocus={e => e.target.style.borderColor = DS.green}
+              onBlur={e => e.target.style.borderColor = DS.gray300}
+            />
+          </div>
+        </div>
+
+        {/* 確認同意書 */}
+        <div style={{ background: DS.white, borderRadius: 14, padding: "16px", marginBottom: 14, boxShadow: DS.shadow, border: `1.5px solid ${form.confirmed ? DS.green : DS.gray300}` }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: DS.navy, marginBottom: 10 }}>📜 投保同意書</div>
+          <div style={{ fontSize: 12, color: DS.gray700, lineHeight: 1.8, marginBottom: 12 }}>
+            本人同意並確認以下事項：<br />
+            1. 上述個人資料均屬真實正確<br />
+            2. 授權台中日領現金工作站代為辦理當日勞工保險加保<br />
+            3. 了解投保生效日為出勤當日<br />
+            4. 工作結束後由雇主辦理退保<br />
+            5. 個人資料僅供投保用途，不另作他用
+          </div>
+          <div onClick={() => upd("confirmed", !form.confirmed)} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "10px", background: form.confirmed ? DS.greenLight : DS.gray50, borderRadius: 10, border: `1.5px solid ${form.confirmed ? DS.green : DS.gray300}` }}>
+            <div style={{ width: 24, height: 24, borderRadius: 6, background: form.confirmed ? DS.green : DS.white, border: `2px solid ${form.confirmed ? DS.green : DS.gray300}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
+              {form.confirmed && <span style={{ color: DS.white, fontSize: 14, fontWeight: 700 }}>✓</span>}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: form.confirmed ? DS.green : DS.navy }}>
+              {form.confirmed ? "✅ 我已閱讀並同意上述條款" : "點此勾選同意投保條款"}
+            </div>
+          </div>
+        </div>
+
+        <button onClick={canSubmit ? submit : () => alert("請填寫完整資料並勾選同意書")}
+          style={{ width: "100%", background: canSubmit ? DS.red : DS.gray300, color: DS.white, border: "none", borderRadius: 26, padding: "15px", fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>
+          {canSubmit ? "🛡️ 確認送出投保申請" : "請填寫完整資料並勾選同意"}
+        </button>
+        <button onClick={() => setStep(1)} style={{ width: "100%", background: "none", border: "none", color: DS.gray500, padding: "10px", fontSize: 13, cursor: "pointer", marginTop: 6 }}>← 返回修改個人資料</button>
+      </div>
+    </div>
+  );
+
+  // 步驟 3：完成
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 28, gap: 16 }}>
+      <div style={{ width: 80, height: 80, borderRadius: "50%", background: DS.green, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 38, animation: "shieldPulse 2s infinite" }}>🛡️</div>
+      <div style={{ fontSize: 22, fontWeight: 800, color: DS.navy, textAlign: "center" }}>投保申請送出！</div>
+      <div style={{ background: DS.greenLight, borderRadius: 14, padding: "16px 18px", width: "100%", maxWidth: 320 }}>
+        <div style={{ fontSize: 13, color: DS.navy, lineHeight: 2 }}>
+          👤 姓名：{form.name}<br />
+          📅 出勤日：{form.workDate}<br />
+          ⏰ 班次：{form.timeSlot}<br />
+          💼 職缺：{form.jobTitle}<br />
+          🏢 雇主：{form.employer}<br />
+          💰 日薪：${form.wage}
+        </div>
+      </div>
+      <div style={{ background: "#FFF3CD", borderRadius: 12, padding: "12px 16px", width: "100%", maxWidth: 320, fontSize: 12, color: "#8B5E00", lineHeight: 1.8 }}>
+        ⏳ 顧問將在 <strong>10分鐘內</strong> 審核確認<br />
+        確認後您會收到簡訊通知<br />
+        <strong>投保確認前請勿出勤！</strong>
+      </div>
+      <div style={{ display: "flex", gap: 10, width: "100%", maxWidth: 320 }}>
+        <button onClick={() => { setStep(0); setForm({ name:"", idNo:"", birthday:"", phone:"", jobTitle:"", employer:"", workDate:"", timeSlot:"", wage:"", location:"", confirmed:false }); }}
+          style={{ flex: 1, background: DS.green, color: DS.white, border: "none", borderRadius: 22, padding: "12px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>再次申請</button>
+        <button onClick={() => setTab("history")}
+          style={{ flex: 1, background: DS.navy, color: DS.white, border: "none", borderRadius: 22, padding: "12px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>查看紀錄</button>
       </div>
     </div>
   );
