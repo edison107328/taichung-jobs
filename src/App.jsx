@@ -709,11 +709,11 @@ function AdminPage({ records, onUpdateStatus }) {
       <div style={{ fontSize: 13, color: DS.gray500 }}>請輸入管理密碼</div>
       <input type="password" value={pw} onChange={e => setPw(e.target.value)} placeholder="密碼" onKeyDown={e => e.key === "Enter" && (pw === "5568" ? setAuth(true) : alert("密碼錯誤"))}
         style={{ border: `1.5px solid ${DS.gray300}`, borderRadius: 24, padding: "12px 20px", fontSize: 15, outline: "none", width: "100%", maxWidth: 280, fontFamily: "inherit", textAlign: "center" }} />
-      <button onClick={() => pw === "5568" ? setAuth(true) : alert("密碼錯誤，預設：admin888")}
+      <button onClick={() => pw === "5568" ? setAuth(true) : alert("密碼錯誤，預設：5568")}
         style={{ background: DS.navy, color: DS.white, border: "none", borderRadius: 24, padding: "12px 36px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
         登入
       </button>
-      <div style={{ fontSize: 11, color: DS.gray300 }}>預設密碼：admin888</div>
+      <div style={{ fontSize: 11, color: DS.gray300 }}>預設密碼：5568</div>
     </div>
   );
 
